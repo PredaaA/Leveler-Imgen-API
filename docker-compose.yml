@@ -1,0 +1,33 @@
+version: "3.5"
+services:
+  leveler-mongodb:
+    image: mongo
+    container_name: leveler-mongodb
+    volumes:
+      - type: bind
+        source: ./mongodata
+        target: /data/db
+    networks:
+      leveler-test-net:
+        ipv4_address: 173.41.0.2
+    restart: unless-stopped
+
+  leveler-api:
+    build: ./api
+    container_name: leveler-api
+    volumes:
+      - ./apidata:/data/config
+    networks:
+      leveler-net:
+        ipv4_address: 173.41.0.3
+    restart: unless-stopped
+    depends_on:
+      - leveler-mongodb
+
+networks:
+  leveler-net:
+    name: leveler-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 173.41.0.0/16
