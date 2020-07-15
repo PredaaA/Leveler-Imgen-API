@@ -274,19 +274,19 @@ class Rank(ImageGeneration):
         right_text_align = 290
         draw.text(
             (right_text_align, 38),
-            self._truncate_text(str(self.server_data['rank']), 12),
+            self.server_data["rank"],
             font=general_info_fnt,
             fill=label_text_color,
         )  # Rank
         draw.text(
             (right_text_align, 58),
-            self._truncate_text(str(self.server_data["exp"]), 12),
+            self.server_data["exp"],
             font=general_info_fnt,
             fill=label_text_color,
         )  # Exp
         draw.text(
             (right_text_align, 78),
-            self._truncate_text(f"${self.user_data['bank_balance']}", 12),
+            self.user_data["bank_balance"],
             font=general_info_fnt,
             fill=label_text_color,
         )  # Credits

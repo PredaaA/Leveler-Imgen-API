@@ -273,9 +273,8 @@ class Profile(ImageGeneration):
         else:
             local_symbol = "S "
 
-        s_rank_txt = local_symbol + self._truncate_text(f"#{self.server_data['rank']}", 8)
         _write_unicode(
-            s_rank_txt,
+            local_symbol + self.server_data["rank"],
             num_local_align - general_info_u_fnt.getsize(local_symbol)[0],
             165,
             general_info_fnt,
@@ -283,13 +282,17 @@ class Profile(ImageGeneration):
             info_text_color,
         )  # Rank
 
-        s_exp_txt = self._truncate_text(str(self.server_data["exp"]), 8)
         _write_unicode(
-            s_exp_txt, num_local_align, 180, general_info_fnt, general_info_u_fnt, info_text_color
+            self.server_data["exp"],
+            num_local_align,
+            180,
+            general_info_fnt,
+            general_info_u_fnt,
+            info_text_color,
         )  # Exp
         draw.text(
             (num_local_align, 195),
-            self._truncate_text(f"${self.user_data['bank_balance']}", 18),
+            self.user_data["bank_balance"],
             font=general_info_fnt,
             fill=info_text_color,
         )  # Credits
@@ -303,9 +306,7 @@ class Profile(ImageGeneration):
             global_symbol = "G "
             fine_adjust = 0
 
-        global_rank = self.user_data["global_rank"]
-        rank_number = global_rank if global_rank else "1000+"
-        rank_txt = global_symbol + self._truncate_text(f"#{rank_number}", 8)
+        rank_txt = global_symbol + self.user_data["global_rank"]
         exp_txt = self._truncate_text(f"{userinfo['total_exp']}", 8)
         _write_unicode(
             rank_txt,
