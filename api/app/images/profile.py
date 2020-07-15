@@ -20,18 +20,6 @@ class Profile(ImageGeneration):
             )
         return await self.db.users.find_one({"user_id": userinfo["user_id"]})
 
-    async def _valid_image_url(self, url):
-        try:
-            async with self.session.get(url) as r:
-                image = await r.content.read()
-            with open(working_path + f"data/tmp/test.png", "wb") as f:
-                f.write(image)
-            Image.open(working_path + f"data/tmp/test.png").convert("RGBA")
-            os.remove(working_path + f"data/tmp/test.png")
-            return True
-        except:
-            return False
-
     async def draw(self):
         if not self._db_ready:
             return None
@@ -386,46 +374,45 @@ class Profile(ImageGeneration):
                     draw_thumb.ellipse((0, 0) + (raw_length, raw_length), fill=255, outline=0)
 
                     # determine image or color for badge bg
-                    if await self._valid_image_url(bg_color):
-                        # get image
-                        async with self.session.get(bg_color) as r:
-                            badge_image = Image.open(BytesIO(await r.read())).convert("RGBA")
-                        badge_image = badge_image.resize((raw_length, raw_length), Image.ANTIALIAS)
+                    # get image
+                    async with self.session.get(bg_color) as r:
+                        badge_image = Image.open(BytesIO(await r.read())).convert("RGBA")
+                    badge_image = badge_image.resize((raw_length, raw_length), Image.ANTIALIAS)
 
-                        # structured like this because if border = 0, still leaves outline.
-                        if border_color:
-                            square = Image.new("RGBA", (raw_length, raw_length), border_color)
-                            # put border on ellipse/circle
-                            output = ImageOps.fit(
-                                square, (raw_length, raw_length), centering=(0.5, 0.5)
-                            )
-                            output = output.resize((size, size), Image.ANTIALIAS)
-                            outer_mask = mask.resize((size, size), Image.ANTIALIAS)
-                            process.paste(output, coord, outer_mask)
+                    # structured like this because if border = 0, still leaves outline.
+                    if border_color:
+                        square = Image.new("RGBA", (raw_length, raw_length), border_color)
+                        # put border on ellipse/circle
+                        output = ImageOps.fit(
+                            square, (raw_length, raw_length), centering=(0.5, 0.5)
+                        )
+                        output = output.resize((size, size), Image.ANTIALIAS)
+                        outer_mask = mask.resize((size, size), Image.ANTIALIAS)
+                        process.paste(output, coord, outer_mask)
 
-                            # put on ellipse/circle
-                            output = ImageOps.fit(
-                                badge_image, (raw_length, raw_length), centering=(0.5, 0.5)
-                            )
-                            output = output.resize(
-                                (size - total_gap, size - total_gap), Image.ANTIALIAS
-                            )
-                            inner_mask = mask.resize(
-                                (size - total_gap, size - total_gap), Image.ANTIALIAS
-                            )
-                            process.paste(
-                                output,
-                                (coord[0] + border_width, coord[1] + border_width),
-                                inner_mask,
-                            )
-                        else:
-                            # put on ellipse/circle
-                            output = ImageOps.fit(
-                                badge_image, (raw_length, raw_length), centering=(0.5, 0.5)
-                            )
-                            output = output.resize((size, size), Image.ANTIALIAS)
-                            outer_mask = mask.resize((size, size), Image.ANTIALIAS)
-                            process.paste(output, coord, outer_mask)
+                        # put on ellipse/circle
+                        output = ImageOps.fit(
+                            badge_image, (raw_length, raw_length), centering=(0.5, 0.5)
+                        )
+                        output = output.resize(
+                            (size - total_gap, size - total_gap), Image.ANTIALIAS
+                        )
+                        inner_mask = mask.resize(
+                            (size - total_gap, size - total_gap), Image.ANTIALIAS
+                        )
+                        process.paste(
+                            output,
+                            (coord[0] + border_width, coord[1] + border_width),
+                            inner_mask,
+                        )
+                    else:
+                        # put on ellipse/circle
+                        output = ImageOps.fit(
+                            badge_image, (raw_length, raw_length), centering=(0.5, 0.5)
+                        )
+                        output = output.resize((size, size), Image.ANTIALIAS)
+                        outer_mask = mask.resize((size, size), Image.ANTIALIAS)
+                        process.paste(output, coord, outer_mask)
                 except:
                     pass
                 i += 1
@@ -443,27 +430,26 @@ class Profile(ImageGeneration):
                 bar_size = (85, 15)
 
                 # determine image or color for badge bg
-                if await self._valid_image_url(bg_color):
-                    async with self.session.get(bg_color) as r:
-                        badge_image = Image.open(BytesIO(await r.read())).convert("RGBA")
+                async with self.session.get(bg_color) as r:
+                    badge_image = Image.open(BytesIO(await r.read())).convert("RGBA")
 
-                    if border_color is not None:
-                        draw.rectangle(
-                            [(left_pos, vert_pos + i * 17), (right_pos, vert_pos + 15 + i * 17)],
-                            fill=border_color,
-                            outline=border_color,
-                        )  # border
-                        badge_image = badge_image.resize(
-                            (bar_size[0] - total_gap + 1, bar_size[1] - total_gap + 1),
-                            Image.ANTIALIAS,
-                        )
-                        process.paste(
-                            badge_image,
-                            (left_pos + border_width, vert_pos + border_width + i * 17),
-                        )
-                    else:
-                        badge_image = badge_image.resize(bar_size, Image.ANTIALIAS)
-                        process.paste(badge_image, (left_pos, vert_pos + i * 17))
+                if border_color is not None:
+                    draw.rectangle(
+                        [(left_pos, vert_pos + i * 17), (right_pos, vert_pos + 15 + i * 17)],
+                        fill=border_color,
+                        outline=border_color,
+                    )  # border
+                    badge_image = badge_image.resize(
+                        (bar_size[0] - total_gap + 1, bar_size[1] - total_gap + 1),
+                        Image.ANTIALIAS,
+                    )
+                    process.paste(
+                        badge_image,
+                        (left_pos + border_width, vert_pos + border_width + i * 17),
+                    )
+                else:
+                    badge_image = badge_image.resize(bar_size, Image.ANTIALIAS)
+                    process.paste(badge_image, (left_pos, vert_pos + i * 17))
 
                 vert_pos += 3  # spacing
                 i += 1
