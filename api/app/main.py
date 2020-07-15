@@ -26,3 +26,8 @@ async def shutdown():
     await mongodb.disconnect()
     loop = asyncio.get_event_loop()
     loop.run_until_complete(session.close())
+
+
+@app.get("/")
+async def index():
+    return None
